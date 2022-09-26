@@ -2,13 +2,16 @@ package com.alura.forum.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.alura.forum.controller.dto.TopicoDTO;
 import com.alura.forum.form.TopicoForm;
@@ -39,8 +42,10 @@ public class Topicos {
 	}
 	
 	@PostMapping
-	public void cadastrar(@RequestBody TopicoForm form) {
+	public ResponseEntity<TopicoDTO> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 		Topico topico = form.converter(cursoRepository);
 		topicoRepository.save(topico);
+		
+		return ResponseEntity.created(uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri()).body(new TopicoDTO(topico));
 	}
 }
